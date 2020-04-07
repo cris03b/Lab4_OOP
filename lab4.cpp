@@ -2,12 +2,42 @@
 //
 
 #include <iostream>
-#include "Repository.h"
+#include "Controller.h"
+#include <cassert>
 
 using namespace std;
 
+void Teste() {
+    Medikament m1("a", "1mg", 1, 1.1);
+    Medikament m2("b", "2mg", 2, 2.2);
+    Medikament m3("c", "3mg", 3, 3.3);
+    Medikament m4("d", "2mg", 4, 4.4);
+    vector<Medikament> v;
+    Repo repo;
+    assert(repo.med.size() == 0);
+    repo.add_med(m1);
+    repo.add_med(m2);
+    repo.add_med(m3);
+    assert(repo.med.size() == 3);
+    repo.delete_med(m3);
+    assert(repo.med.size() == 2);
+    /*repo.delete_med(m4);
+    assert(repo.med.size() == 2);*/  // merge assert-ul si aici, doar ca daca il lasam va aparea pe ecran mesaj inainte de optiuni
+    repo.add_med(m3);
+    repo.add_med(m4);
+    v = repo.show_med("Konzentration", "2mg");
+    assert(v.size() == 2);
+    v.clear();
+    v = repo.show_med("", "");
+    assert(v.size() == 4);
+    v.clear();
+    v = repo.show_knapp(4);
+    assert(v.size() == 3);
+
+}
+
 Medikament read_med() {
-    
+    // citire medicament de la tastatura
     string name;
     string konzentration;
     int menge;
@@ -24,8 +54,18 @@ Medikament read_med() {
     return m;
 }
 
+/*
+    undo_med si redo_med = vectori care tin informatia precedenta (cu un pas inapoi) respectiv cea de dupa modificare (la inceput = med)
+    opt = optiune aleasa
+    prev_opt = optiunea precedenta (pentru fct undo si redo)
+    menge = integer pt fct show_knapp
+    option = string pt fct show_med si gruppiert_nach_preis
+    spec = string pt fct show_med
+*/
+
 int main()
 {
+    Teste();
 
     Repo repo;
     vector<Medikament> undo_med, redo_med;
@@ -53,6 +93,7 @@ int main()
             cout << "Ein Medikament einfugen" << endl;
             prev_opt = 1;
             undo_med.clear();
+            // undo va primi elementele din vectorul med inainte de modificare
             for (int i = 0; i < repo.med.size(); i++) {
                 undo_med.push_back(repo.med[i]);
             }
@@ -161,11 +202,14 @@ int main()
 
         else if (opt == 8) {
             cout << "Undo" << endl;
-            if (prev_opt == 1 || prev_opt == 2 || prev_opt == 3) {                
+            if (prev_opt == 1 || prev_opt == 2 || prev_opt == 3) {  
+                // undo si redo se pot face doar la add, delete sau edit
+                // vectorul redo primeste elm din vectorul med
                 redo_med.clear();
                 for (int j = 0; j < repo.med.size(); j++) {
                     redo_med.push_back(repo.med[j]);
                 }
+                // vectorul med primeste elm din vect undo
                 repo.med.clear();
                 for (int i = 0; i < undo_med.size(); i++) {
                     repo.med.push_back(undo_med[i]);
@@ -176,6 +220,7 @@ int main()
         else if (opt == 9) {
             cout << "Redo" << endl;
             if (prev_opt == 1 || prev_opt == 2 || prev_opt == 3) {
+                // vect med primeste elm din vect redo
                 repo.med.clear();
                 for (int i = 0; i < redo_med.size(); i++) {
                     repo.med.push_back(redo_med[i]);
@@ -195,4 +240,5 @@ int main()
     }
    
 }
+
 

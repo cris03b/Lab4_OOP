@@ -1,4 +1,4 @@
-#include "Repository.h"
+#include "Controller.h"
 #include <vector>
 #include <sstream>
 #include <algorithm>
@@ -23,9 +23,16 @@ void Repo::add_med(Medikament m) {
 }
 
 vector<Medikament> Repo::show_med(string option, string details) {
+	/* 
+		option = categoria dupa care vor fi afisate medicamentele (Name, Konz, Menge si Preis)
+	    details = caracteristica dupa care vor fi afisate med. din categoria aleasa 
+	    show_v = vectorul in care vor fi puse elm gasite
+	 */
+
 	vector<Medikament> show_v;
 	if (option == "Name") {
 		for (auto i = med.begin(); i != med.end(); ++i) {
+			// se parcurge vectorul, daca s-a gasit string-ul la un elm din vectorul cu med, se creeaza un med care se adauga la vectorul show_v
 			if (i->getName() == details) {
 				Medikament m1(i->getName(), i->getKonz(), i->getMenge(), i->getPreis());
 				show_v.push_back(m1);
@@ -36,6 +43,7 @@ vector<Medikament> Repo::show_med(string option, string details) {
 
 	else if (option == "Konzentration") {
 		for (auto i = med.begin(); i != med.end(); ++i) {
+			// analog
 			if (i->getKonz() == details) {
 				Medikament m1(i->getName(), i->getKonz(), i->getMenge(), i->getPreis());
 				show_v.push_back(m1);
@@ -45,6 +53,7 @@ vector<Medikament> Repo::show_med(string option, string details) {
 	}
 
 	else if (option == "Menge") {
+		// daca optiunea aleasa este 'Menge', se va converti str details intr-un int, pt a putea fi comparat cu 'Menge' de la fiecare obiect din vector
 		int nr;
 		istringstream(details) >> nr;
 		for (auto i = med.begin(); i != med.end(); ++i) {
@@ -59,7 +68,7 @@ vector<Medikament> Repo::show_med(string option, string details) {
 	else if (option == "Preis") {
 		for (auto i = med.begin(); i != med.end(); ++i) {
 			// convert string to float
-			// daca details = doar string (fara numere) => price = 0
+			// daca details e doar string (fara numere) => price = 0
 			float price = i->getPreis();
 			stringstream ss;
 			ss << details;
@@ -73,19 +82,27 @@ vector<Medikament> Repo::show_med(string option, string details) {
 
 	}
 	else if (option == "" && details == ""){
+		// sortare crescatoare lexicografica
 		sort(med.begin(), med.end(), [](Medikament& lhs, Medikament& rhs) {return lhs.getName() < rhs.getName(); });
 		return med;
 	}
 	
 	else {
+		// altfel => return vector cu toate elementele
+		cout << "Es gibt nicht solche Eigenschaften..." << endl;
 		return med;
 	}
 	
 }
 
 vector<Medikament> Repo::show_knapp(int x) {
+	/*
+		x = numarul de pastile (Menge) introdus de user
+		show_v = vectorul in care vor fi puse elm gasite
+	*/
 	vector<Medikament> show_v;
 	for (auto i = med.begin(); i != med.end(); ++i) {
+		// daca se gaseste elm cu menge < x => se creeaza obiectul si se adauga la show_v
 		if (i->getMenge() < x) {
 			Medikament m1(i->getName(), i->getKonz(), i->getMenge(), i->getPreis());
 			show_v.push_back(m1);
