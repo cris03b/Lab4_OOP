@@ -27,12 +27,10 @@ Medikament read_med() {
 int main()
 {
 
-    /*Medikament m = read_med();
-    cout << m.getName() << " " << m.getKonz() << " " << m.getMenge() << " " << m.getPreis();*/
     Repo repo;
-    vector<Medikament> init_med;
-    init_med = repo.med;
-    int opt, prev_opt;
+    vector<Medikament> undo_med, redo_med;
+    undo_med = redo_med = repo.med;
+    int opt, prev_opt, menge;
     string option, spec;
     while (true) {
         cout << endl << \
@@ -42,54 +40,151 @@ int main()
             "4. Alle Medikamente anzeigen" << endl << \
             "5. Verfugbare Medikamente anzeigen" << endl << \
             "6. Knapp Medikamente anzeigen" << endl << \
-            "7. Medikamente nach Preis gruppiert" << endl << \
+            "7. Medikamente nach Preis gruppieren" << endl << \
             "8. Undo" << endl << \
             "9. Redo" << endl << \
             "10. Out" << endl;
         
         cout << endl << "Option: ";
         cin >> opt;
+        cout << endl;
 
         if (opt == 1) {
+            cout << "Ein Medikament einfugen" << endl;
             prev_opt = 1;
-            init_med.clear();
+            undo_med.clear();
             for (int i = 0; i < repo.med.size(); i++) {
-                init_med.push_back(repo.med[i]);
+                undo_med.push_back(repo.med[i]);
             }
             Medikament m = read_med();
             repo.add_med(m);
         }
 
+        else if (opt == 2) {
+            cout << "Ein Medikament loschen" << endl;
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
+            }
+            else {
+                prev_opt = 2;
+                undo_med.clear();
+                for (int i = 0; i < repo.med.size(); i++) {
+                    undo_med.push_back(repo.med[i]);
+                }
+                Medikament m = read_med();
+                repo.delete_med(m);
+            }
+        }
+
+        else if (opt == 3) {
+            cout << "Ein Medikament bearbeiten" << endl;  
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
+            }
+            else {
+                prev_opt = 3;
+                undo_med.clear();
+                for (int i = 0; i < repo.med.size(); i++) {
+                    undo_med.push_back(repo.med[i]);
+                }
+                Medikament m = read_med();
+                cout << "Hint: fur Option kann man 'Name', 'Konzentration', 'Menge' oder 'Preis' wahlen" << endl;
+                cout << "Option: ";
+                cin >> option;
+                repo.edit_med(m, option);
+            }
+        }
+
         else if (opt == 4) {
-            for (auto i = repo.med.begin(); i != repo.med.end(); ++i) {
-                cout << i->getName() << " " << i->getKonz() << " " << i->getMenge() << " " << i->getPreis() << endl;
+            cout << "Alle Medikamente anzeigen: " << endl;
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
+            }
+            else {
+                for (auto i = repo.med.begin(); i != repo.med.end(); ++i) {
+                    cout << "Name: " << i->getName() << ", Konzentration: " << i->getKonz() << ", Menge: " << i->getMenge() << ", Preis: " << i->getPreis() << endl;
+                }
             }
         }
 
         else if (opt == 5) {
-            cout << "Alle verfugbare Medikamente anzeigen, die eine spezifische Eigenschaft haben" << \
-                endl << "Hint: fur Option kann man 'Name', 'Konzentration', 'Menge' oder 'Preis' wahlen" << endl;
-            cout << "Option: ";
-            cin >> option;
-            cout << "Bezeichnung: ";
-            cin >> spec;
-            vector<Medikament> vect = repo.show_med(option, spec);
-            for (auto i1 = vect.begin(); i1 != vect.end(); ++i1) {
-                cout << i1->getName() << " " << i1->getKonz() << " " << i1->getMenge() << " " << i1->getPreis() << endl;
+            cout << "Alle verfugbare Medikamente anzeigen, die eine spezifische Eigenschaft haben" << endl;
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
             }
+            else {
+                cout << "Hint: fur Option kann man 'Name', 'Konzentration', 'Menge' oder 'Preis' wahlen" << endl;
+                cout << "Option: ";
+                cin >> option;
+                cout << "Bezeichnung: ";
+                cin >> spec;
+                cout << endl;
+                vector<Medikament> vect = repo.show_med(option, spec);
+                for (auto i = vect.begin(); i != vect.end(); ++i) {
+                    cout << "Name: " << i->getName() << ", Konzentration: " << i->getKonz() << ", Menge: " << i->getMenge() << ", Preis: " << i->getPreis() << endl;
+                }
+            }
+        }
 
+        else if (opt == 6) {
+            cout << "Alle Medikamente anzeigen, die knapp sind" << endl;
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
+            }
+            else {
+                cout << "Hint: Es werden nur Medikamente mit einer Menge < 'Menge' angezeigt" << endl;
+                cout << "Menge: ";
+                cin >> menge;
+                cout << endl;
+                vector<Medikament> vect = repo.show_knapp(menge);
+                for (auto i = vect.begin(); i != vect.end(); ++i) {
+                    cout << "Name: " << i->getName() << ", Konzentration: " << i->getKonz() << ", Menge: " << i->getMenge() << ", Preis: " << i->getPreis() << endl;
+                }
+            }
+        }
+
+        else if (opt == 7) {
+            cout << "Medikamente nach Preis gruppieren" << endl;
+            if (repo.med.empty()) {
+                cout << "Es gibt keine Medikamente...";
+            }
+            else {
+                cout << "Hint: Option kann entweder 'steigend' oder 'fallend' sein" << endl;
+                cout << "Option: ";
+                cin >> option;
+                repo.gruppiert_nach_preis(option);
+                for (auto i = repo.med.begin(); i != repo.med.end(); ++i) {
+                    cout << "Name: " << i->getName() << ", Konzentration: " << i->getKonz() << ", Menge: " << i->getMenge() << ", Preis: " << i->getPreis() << endl;
+                }
+            }
         }
 
         else if (opt == 8) {
-            repo.med.clear();
-            if (prev_opt == 1) {
-                for (int i = 0; i < init_med.size(); i++) {
-                    repo.med.push_back(init_med[i]);
+            cout << "Undo" << endl;
+            if (prev_opt == 1 || prev_opt == 2 || prev_opt == 3) {                
+                redo_med.clear();
+                for (int j = 0; j < repo.med.size(); j++) {
+                    redo_med.push_back(repo.med[j]);
+                }
+                repo.med.clear();
+                for (int i = 0; i < undo_med.size(); i++) {
+                    repo.med.push_back(undo_med[i]);
+                }
+            }
+        }
+
+        else if (opt == 9) {
+            cout << "Redo" << endl;
+            if (prev_opt == 1 || prev_opt == 2 || prev_opt == 3) {
+                repo.med.clear();
+                for (int i = 0; i < redo_med.size(); i++) {
+                    repo.med.push_back(redo_med[i]);
                 }
             }
         }
 
         else if (opt == 10) {
+            cout << "Aufwiedersehen!" << endl << "Stay safe and wash your hands! :D" << endl;
             return false;
         }
 
@@ -98,44 +193,6 @@ int main()
         }
 
     }
-   /* Medikament m1("a1", "40mg", 5, 20);
-    Medikament m2("a2", "45mg", 6, 25);
-    Medikament m3("a1", "45mg", 6, 20);
-    Medikament m4("a3", "80mg", 3, 22.3);
-
-    Repo repo;
-    repo.add_med(m1);
-    repo.add_med(m2);
-    repo.add_med(m4);
-    repo.add_med(m3);
-
-    for (auto i = repo.med.begin(); i != repo.med.end(); ++i) {
-        cout << i->getName() << " " << i->getKonz() << " " << i->getMenge() << " " << i->getPreis() << endl;
-    }
-
-    cout << "undo" << endl;
-    repo.undo();
-    for (auto i = repo.med.begin(); i != repo.med.end(); ++i) {
-        cout << i->getName() << " " << i->getKonz() << " " << i->getMenge() << " " << i->getPreis() << endl;
-    }
-
-
-
-    cout << "preferinte" << endl;
-    string opt = "Preis";
-    string spec = "22.3";
-    vector<Medikament> vect = repo.show_med(opt, spec);
-    for (auto i1 = vect.begin(); i1 != vect.end(); ++i1) {
-        cout << i1->getName() << " " << i1->getKonz() << " " << i1->getMenge() << " " << i1->getPreis() << endl;
-      }
-
-    cout << "knapp" << endl;
-    int x;
-    cout << "x: ";
-    cin >> x;
-    vector<Medikament> v = repo.show_knapp(x);
-    for (auto i2 = v.begin(); i2 != v.end(); ++i2) {
-        cout << i2->getName() << " " << i2->getKonz() << " " << i2->getMenge() << " " << i2->getPreis() << endl;
-    }*/
+   
 }
 

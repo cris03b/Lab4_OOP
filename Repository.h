@@ -10,5 +10,7 @@ public:
 	void add_med(Medikament m);
 	vector<Medikament> show_med(string option, string details); //ex2
 	vector<Medikament> show_knapp(int x);
-	vector<Medikament> undo();
+	void delete_med(Medikament m);
+	void edit_med(Medikament& m, string option);
+	void gruppiert_nach_preis(string s_od_f);
 };
