@@ -1,5 +1,5 @@
 #include "Medikament.h"
-//include
+
 using namespace std;
 
 Medikament::Medikament(string name, string konzentration, int menge, float preis) {
