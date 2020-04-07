@@ -7,6 +7,9 @@ using namespace std;
 
 
 void Repo::add_med(Medikament m) {
+	//adauga un element in vectorul med
+	//daca gaseste elementul care are aceeasi concentratie, ii schima doar cantitatea si pretul
+	//cantitatea se adauga la cantitatea anterioara
 	bool found_name = false;
 	for (auto i = med.begin(); i != med.end(); ++i) {
 		if (i->getName() == m.getName() && i->getKonz() == m.getKonz()) {
@@ -17,6 +20,7 @@ void Repo::add_med(Medikament m) {
 			break;
 		}		
 	}
+	//daca nu se gaseste elementul, sau daca concentratia este diferita, se adauga elementul in lista de medicamente
 	if (found_name == false || med.empty()) {
 		med.push_back(m);		
 	}
@@ -112,6 +116,9 @@ vector<Medikament> Repo::show_knapp(int x) {
 }
 
 void Repo::delete_med(Medikament m) {
+	//sterge un element din vecorul med (lista de medicamente)
+	//cauta daca elementul pe care vrei sa il stergi exista si daca exista, 
+	//se adauga toate celelalte elemente din vector intr-unul nou
 	bool ok = false;
 	vector<Medikament> vect;
 	for (auto i = med.begin(); i != med.end(); ++i) {
@@ -135,6 +142,8 @@ void Repo::delete_med(Medikament m) {
 }
 
 void Repo::edit_med(Medikament& m, string option) {
+	//editeaza un medicament dupa criteriul ales (option)
+	//cauta in vector medicamentul care trebuie editat si daca l-a gasit, ii modifica atributul in cel citit
 	bool opt = false;
 	for (auto i = med.begin(); i != med.end(); ++i) {
 		if (i->getName() == m.getName() && i->getKonz() == m.getKonz() && i->getMenge() == m.getMenge() && i->getPreis() == m.getPreis()) {
@@ -179,6 +188,8 @@ void Repo::edit_med(Medikament& m, string option) {
 }
 
 void Repo::gruppiert_nach_preis(string s_od_f) {
+	//grupeaza medicamentele dupa pret
+	//pot fi grupate crescator sau descrescator in functie de preferinta utilizatorului
 	//steigend oder fallend
 	if (s_od_f == "steigend") {
 		sort(med.begin(), med.end(), [](Medikament& lhs, Medikament& rhs) {
